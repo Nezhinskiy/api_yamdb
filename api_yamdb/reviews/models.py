@@ -34,7 +34,7 @@ class Reviews(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='comments',
+        related_name='reviews',
         verbose_name='Автор',
     )
     score = models.IntegerField(choices=SCORES, verbose_name='Баллы')
@@ -43,3 +43,26 @@ class Reviews(models.Model):
         verbose_name='Дата публикации',
         db_index=True,
     )
+
+class Comments(models.Model):
+    review_id = models.ForeignKey(
+        Reviews,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Ревью',
+        help_text='Ревью, к которой будет относиться комментарий',
+    )
+    text = models.TextField(verbose_name='Текст комментария',
+                            help_text='Текст нового комментария')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор',
+    )
+    pup_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации',
+        db_index=True,
+    )
+
