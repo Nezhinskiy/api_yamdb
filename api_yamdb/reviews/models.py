@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from titles.models import Title
 
 User = get_user_model()
 
@@ -15,10 +16,6 @@ SCORES = (
     (9, 'Я ничего не понял, но сделаю вид, что всё понял'),
     (10, 'Рыдала вся маршрутка')
 )
-
-
-class Title(models.Model):
-    pass
 
 
 class Reviews(models.Model):
@@ -44,6 +41,7 @@ class Reviews(models.Model):
         db_index=True,
     )
 
+
 class Comments(models.Model):
     review_id = models.ForeignKey(
         Reviews,
@@ -65,4 +63,3 @@ class Comments(models.Model):
         verbose_name='Дата публикации',
         db_index=True,
     )
-
