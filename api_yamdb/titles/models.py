@@ -1,5 +1,4 @@
 import datetime
-from tabnanny import verbose
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -42,7 +41,6 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         'Genre',
-        on_delete=models.SET_NULL,
         blank=True,
         verbose_name='Жанр',
         related_name='Genre'
