@@ -45,14 +45,14 @@ class Title(models.Model):
         verbose_name='Жанр',
         related_name='titles'
     )
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         ordering = ('year',)
-        verbose_name='Произведение'
-        verbose_name_plural='Произведения'
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
 
 class Category(models.Model):
