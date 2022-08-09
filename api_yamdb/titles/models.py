@@ -37,13 +37,13 @@ class Title(models.Model):
         null=True,
         blank=True,
         verbose_name='Категория',
-        related_name='Category'
+        related_name='titles'
     )
     genre = models.ManyToManyField(
         'Genre',
         blank=True,
         verbose_name='Жанр',
-        related_name='Genre'
+        related_name='titles'
     )
     
     def __str__(self):
