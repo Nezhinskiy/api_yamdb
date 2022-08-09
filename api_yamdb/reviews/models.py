@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from titles.models import Title
 
 from titles.models import Title
 
@@ -20,7 +19,7 @@ SCORES = (
 )
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     title_id = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -44,9 +43,9 @@ class Reviews(models.Model):
     )
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     review_id = models.ForeignKey(
-        Reviews,
+        Review,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Ревью',
