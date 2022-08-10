@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-
 from titles.models import Title
 
 User = get_user_model()
 
-SCORES = (
+DISPLAYED_LETTERS = 15
+
+SCORE_CHOICES = (
     (1, 'Пришлось соврать, что смотрю порно, когда мама вошла в комнату'),
     (2, 'Каждый в моей комнате стал тупее'),
     (3, 'Лучше б я этого не видел'),
@@ -25,22 +26,31 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение',
-        help_text='Произведение, к которой будет относиться ревью',
+        help_text='Произведение, к которой будет относиться ревью'
     )
-    text = models.TextField(verbose_name='Текст ревью',
-                            help_text='Текст нового ревью')
+    text = models.TextField()
     author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='reviews',
-        verbose_name='Автор',
+        User, on_delete=models.CASCADE, related_name='reviews'
     )
-    score = models.IntegerField(choices=SCORES, verbose_name='Баллы')
+    score = models.IntegerField(
+        choices=SCORE_CHOICES, verbose_name='Баллы'
+    )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
-        db_index=True,
+        db_index=True
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name='unique_review')]
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:DISPLAYED_LETTERS]
 
 
 class Comment(models.Model):
@@ -49,7 +59,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Ревью',
-        help_text='Ревью, к которой будет относиться комментарий',
+        help_text='Ревью, к которой будет относиться комментарий'
     )
     text = models.TextField(verbose_name='Текст комментария',
                             help_text='Текст нового комментария')
@@ -57,10 +67,18 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Автор',
+        verbose_name='Автор'
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
-        db_index=True,
+        db_index=True
     )
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:DISPLAYED_LETTERS]

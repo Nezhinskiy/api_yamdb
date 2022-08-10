@@ -1,9 +1,9 @@
 import datetime
-import sqlite3
 from pathlib import Path
+import sqlite3
 
-import pandas as pd
 from django.core.management.base import BaseCommand, CommandError
+import pandas as pd
 
 
 class Command(BaseCommand):
