@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 ('score', models.IntegerField(choices=[(1, 'Пришлось соврать, что смотрю порно, когда мама вошла в комнату'), (2, 'Каждый в моей комнате стал тупее'), (3, 'Лучше б я этого не видел'), (4, '3,6 - не отлично, но и не ужасно.'), (5, 'Видали мы и по-лучше'), (6, 'Потенциал не раскрыт'), (7, 'Пересматривать бы не стал'), (8, 'Моё уважение'), (9, 'Я ничего не понял, но сделаю вид, что всё понял'), (10, 'Рыдала вся маршрутка')], verbose_name='Баллы')),
                 ('pub_date', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата публикации')),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to=settings.AUTH_USER_MODEL)),
+
                 ('title', models.ForeignKey(help_text='Произведение, к которой будет относиться ревью', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='titles.Title', verbose_name='Произведение')),
             ],
             options={

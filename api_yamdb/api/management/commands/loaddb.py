@@ -32,7 +32,7 @@ class Command(BaseCommand):
     }
 
     COLUMNS = {
-        'author': 'auhtor_id',
+        'author': 'author_id',
         'review': 'review_id',
         'title': 'title_id',
         'genre': 'genre_id',
