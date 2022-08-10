@@ -59,8 +59,9 @@ class Command(BaseCommand):
                             is_staff=False,
                             is_active=True,
                             date_joined=datetime.datetime.now(),
-                            confirmation_code=None,
                         )
+                    elif table.name == 'titles.csv':
+                        df = df.assign(description=None)
 
                     df.to_sql(
                         name=self.DB_TABLES[table.name],

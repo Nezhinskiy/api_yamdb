@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.db import models
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -35,19 +36,21 @@ class SignUpSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user, _ = User.objects.get_or_create(**validated_data)
-        user.generate_confirmation_code()
+        token = default_token_generator.make_token(user)
         user.save()
-        user.send_confirmation_code()
+        user.send_confirmation_code(token)
         return user
 
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField()
-    confirmation_code = serializers.IntegerField()
+    confirmation_code = serializers.CharField()
 
     def validate(self, data):
         user = get_object_or_404(User, username=data['username'])
-        if user.confirmation_code != data['confirmation_code']:
+        if not default_token_generator.check_token(
+            user, data['confirmation_code']
+        ):
             raise serializers.ValidationError(
                 {'confirmation_code': 'Неверный код подтверждения!'}
             )

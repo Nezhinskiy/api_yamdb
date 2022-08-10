@@ -3,6 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from reviews.models import Comment, Review
+from titles.models import Title
 
 from . import serializers
 from .permissions import IsAdministrator, IsAuthorOrReadOnly
@@ -72,7 +74,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title_id=title)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.select_related('review', 'author').all()
     serializer_class = CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
