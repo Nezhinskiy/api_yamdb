@@ -45,9 +45,6 @@ class TokenSerializer(serializers.Serializer):
     username = serializers.CharField()
     confirmation_code = serializers.IntegerField()
 
-    def create(self, validated_data):
-        return User.objects.get(username=validated_data['username'])
-
     def validate(self, data):
         user = get_object_or_404(User, username=data['username'])
         if user.confirmation_code != data['confirmation_code']:
@@ -55,6 +52,17 @@ class TokenSerializer(serializers.Serializer):
                 {'confirmation_code': 'Неверный код подтверждения!'}
             )
         return data
+
+
+    def create(self, validated_data):
+        return User.objects.get(username=validated_data['username'])
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
