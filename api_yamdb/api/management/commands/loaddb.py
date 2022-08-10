@@ -42,7 +42,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             sqlite_connection = sqlite3.connect(self.DB_URI, uri=True)
-            self.stdout.write(self.style.SUCCESS('База данных создана и успешно подключена к SQLite'))
+            self.stdout.write(
+                self.style.SUCCESS('Успешное подключение к SQLite')
+            )
 
             for table in self.TABLES_PATH.glob('*.csv'):
                 if table.name in self.DB_TABLES:
@@ -56,7 +58,7 @@ class Command(BaseCommand):
                             is_superuser=False,
                             is_staff=False,
                             is_active=True,
-                            date_joined=datetime.datetime.now(),                            
+                            date_joined=datetime.datetime.now(),
                             confirmation_code=None,
                         )
 
@@ -70,8 +72,12 @@ class Command(BaseCommand):
 
         except sqlite3.Error as error:
             sqlite_connection = None
-            raise CommandError(f'Ошибка при подключении к sqlite: {error}') from error
+            raise CommandError(
+                f'Ошибка при подключении к sqlite: {error}'
+            ) from error
         finally:
             if sqlite_connection:
                 sqlite_connection.close()
-                self.stdout.write(self.style.SUCCESS('Соединение с SQLite закрыто'))
+                self.stdout.write(
+                    self.style.SUCCESS('Соединение с SQLite закрыто')
+                )
