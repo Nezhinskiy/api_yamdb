@@ -59,7 +59,6 @@ class Command(BaseCommand):
                             is_staff=False,
                             is_active=True,
                             date_joined=datetime.datetime.now(),
-                            confirmation_code=None,
                         )
 
                     df.to_sql(
