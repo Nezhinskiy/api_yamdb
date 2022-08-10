@@ -20,7 +20,7 @@ SCORES = (
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews',
@@ -36,7 +36,7 @@ class Review(models.Model):
         verbose_name='Автор',
     )
     score = models.IntegerField(choices=SCORES, verbose_name='Баллы')
-    pup_date = models.DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
         db_index=True,
@@ -44,7 +44,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    review_id = models.ForeignKey(
+    review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
@@ -59,7 +59,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Автор',
     )
-    pup_date = models.DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
         db_index=True,
