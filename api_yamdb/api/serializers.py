@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.db import models
+from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
 from reviews.models import Comment, Review
 
 User = get_user_model()
@@ -69,19 +69,36 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True)
+        read_only=True, slug_field='username'
+    )
+    title = serializers.SlugRelatedField(
+        read_only=True, slug_field='pk'
+    )
+
+    def validate(self, data):
+        title = self.context['view'].kwargs['title_id']
+        author = self.context['request'].user
+        is_exists = Review.objects.filter(title=title, author=author)
+        if self.context['request'].method != 'PATCH':
+            if is_exists:
+                raise ValidationError(
+                    'Нельзя оставить более одного отзыва к одному произведению'
+                )
+        return data
 
     class Meta:
         model = Review
         fields = '__all__'
-        read_only_fields = ('title',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True)
+        read_only=True, slug_field='username'
+    )
+    review = serializers.SlugRelatedField(
+        read_only=True, slug_field='pk'
+    )
 
     class Meta:
         model = Comment
         fields = '__all__'
-        read_only_fields = ('review',)

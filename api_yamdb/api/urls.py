@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from . import views
+from api import views
 
 app_name = 'api'
 
@@ -11,7 +11,6 @@ router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews',
     views.ReviewViewSet, basename='review'
 )
-
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     views.CommentViewSet, basename='comment'
