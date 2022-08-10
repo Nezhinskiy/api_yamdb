@@ -36,7 +36,7 @@ class Review(models.Model):
         verbose_name='Автор',
     )
     score = models.IntegerField(choices=SCORES, verbose_name='Баллы')
-    pup_date = models.DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
         db_index=True,
@@ -59,7 +59,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Автор',
     )
-    pup_date = models.DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
         db_index=True,
