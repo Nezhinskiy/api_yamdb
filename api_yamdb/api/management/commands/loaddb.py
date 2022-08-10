@@ -60,6 +60,8 @@ class Command(BaseCommand):
                             is_active=True,
                             date_joined=datetime.datetime.now(),
                         )
+                    elif table.name == 'titles.csv':
+                        df = df.assign(description=None)
 
                     df.to_sql(
                         name=self.DB_TABLES[table.name],
