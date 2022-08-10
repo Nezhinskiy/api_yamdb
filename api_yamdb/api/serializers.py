@@ -53,7 +53,6 @@ class TokenSerializer(serializers.Serializer):
             )
         return data
 
-
     def create(self, validated_data):
         return User.objects.get(username=validated_data['username'])
 
@@ -72,6 +71,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+        read_only_fields = ('title',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -81,4 +81,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
-        read_only_fields = ('review_id',)
+        read_only_fields = ('review',)
