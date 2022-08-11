@@ -3,7 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db import models
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
+from rest_framework import validators, serializers
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
 
@@ -68,43 +68,6 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name', 'bio', 'role')
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
-    title = serializers.SlugRelatedField(
-        read_only=True, slug_field='pk'
-    )
-
-    def validate(self, data):
-        title = self.context['view'].kwargs['title_id']
-        author = self.context['request'].user
-        is_exists = Review.objects.filter(title=title, author=author)
-        if self.context['request'].method != 'PATCH':
-            if is_exists:
-                raise ValidationError(
-                    'Нельзя оставить более одного отзыва к одному произведению'
-                )
-        return data
-
-    class Meta:
-        model = Review
-        fields = '__all__'
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
-    )
-    review = serializers.SlugRelatedField(
-        read_only=True, slug_field='pk'
-    )
-
-    class Meta:
-        model = Comment
-        fields = '__all__'
-
-
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
@@ -143,3 +106,44 @@ class TitlePostSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year',
                   'description', 'genre', 'category')
         model = Title
+
+
+class CurrentTitleDefault:
+    requires_context = True
+
+    def __call__(self, serializer_field):
+        return serializer_field.context['view'].kwargs['title_id']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username',
+        default=serializers.CurrentUserDefault()
+    )
+    title = serializers.SlugRelatedField(
+        read_only=True, slug_field='pk',
+        default=CurrentTitleDefault()
+    )
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=Review.objects.select_related('title', 'author').all(),
+                fields=['title', 'author']
+            )
+        ]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+    review = serializers.SlugRelatedField(
+        read_only=True, slug_field='pk'
+    )
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
