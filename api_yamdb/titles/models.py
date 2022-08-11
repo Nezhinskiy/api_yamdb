@@ -14,7 +14,7 @@ class Title(models.Model):
     """Название произведения."""
     name = models.TextField(
         'Название произведения',
-        max_length='200',
+        max_length=200,
         db_index=True,
         help_text='Введите название произведения'
     )
@@ -73,7 +73,7 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('slug',)
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -96,6 +96,6 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('slug',)
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
