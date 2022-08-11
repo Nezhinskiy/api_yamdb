@@ -7,7 +7,7 @@ from reviews.models import Comment, Review
 from titles.models import Title
 
 from api import serializers
-from api.permissions import (IsAdministrator,
+from api.permissions import (IsAdministrator, IsAuthorOrReadOnly,
                              IsAuthorOrModeratorOrAdminOrReadOnly)
 from api.serializers import CommentSerializer, ReviewSerializer
 from api.utils import get_token_for_user
@@ -20,10 +20,9 @@ class SignUpView(APIView):
 
     def post(self, request):
         serializer = serializers.SignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetTokenView(APIView):
@@ -31,11 +30,9 @@ class GetTokenView(APIView):
 
     def post(self, request):
         serializer = serializers.TokenSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(get_token_for_user(user),
-                            status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(get_token_for_user(user), status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
