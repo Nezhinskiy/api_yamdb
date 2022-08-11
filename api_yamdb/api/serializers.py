@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.db import models
-from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import validators, serializers
 from reviews.models import Comment, Review
@@ -130,7 +129,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = '__all__'
         validators = [
             validators.UniqueTogetherValidator(
-                queryset=Review.objects.select_related('title', 'author').all(),
+                queryset=Review.objects.select_related('title',
+                                                       'author').all(),
                 fields=['title', 'author']
             )
         ]
