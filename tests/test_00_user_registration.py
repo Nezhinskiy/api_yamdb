@@ -1,6 +1,6 @@
-import pytest
 from django.contrib.auth import get_user_model
 from django.core import mail
+import pytest
 
 User = get_user_model()
 
