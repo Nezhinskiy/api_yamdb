@@ -1,13 +1,10 @@
-import datetime
-
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
-def max_value_current_year(value):
-    return MaxValueValidator(
-        datetime.date.today().year, "Год не может быть больше текущего")(
-        value)
+# def max_value_current_year(value):
+#     return MaxValueValidator(
+#         datetime.date.today().year, "Год не может быть больше текущего")(
+#         value)
 
 
 class Title(models.Model):
@@ -24,7 +21,6 @@ class Title(models.Model):
         blank=True,
         db_index=True,
         help_text='Год релиза',
-        validators=[MinValueValidator(1800), max_value_current_year]
     )
     description = models.TextField(
         'Описание',

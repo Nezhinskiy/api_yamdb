@@ -15,6 +15,9 @@ router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     views.CommentViewSet, basename='comment'
 )
+router_v1.register(r'categories', views.CategoryViewSet, basename='category')
+router_v1.register(r'genres', views.GenreViewSet, basename='genre')
+router_v1.register(r'titles', views.TitleViewSet, basename='title')
 
 urlpatterns = [
     path('v1/auth/signup/', views.SignUpView.as_view(), name='auth_signup'),
