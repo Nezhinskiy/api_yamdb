@@ -1,17 +1,20 @@
+import datetime
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
-# def max_value_current_year(value):
-#     return MaxValueValidator(
-#         datetime.date.today().year, "Год не может быть больше текущего")(
-#         value)
+def max_value_current_year(value):
+    return MaxValueValidator(
+        datetime.date.today().year, "Год не может быть больше текущего")(
+        value)
 
 
 class Title(models.Model):
     """Название произведения."""
     name = models.TextField(
         'Название произведения',
-        max_length='200',
+        max_length=200,
         db_index=True,
         help_text='Введите название произведения'
     )
@@ -21,6 +24,7 @@ class Title(models.Model):
         blank=True,
         db_index=True,
         help_text='Год релиза',
+        validators=[MinValueValidator(1800), max_value_current_year]
     )
     description = models.TextField(
         'Описание',
@@ -69,7 +73,7 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('slug',)
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -92,6 +96,6 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('slug',)
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
