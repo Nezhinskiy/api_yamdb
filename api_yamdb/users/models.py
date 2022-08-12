@@ -22,11 +22,13 @@ class User(AbstractUser):
     email = models.EmailField(
         verbose_name='Email',
         unique=True,
+        help_text='Введите адрес email',
     )
 
     bio = models.TextField(
         verbose_name='Биография',
         blank=True,
+        help_text='Введите текст биографии',
     )
 
     role = models.CharField(
@@ -34,6 +36,7 @@ class User(AbstractUser):
         max_length=15,
         choices=ROLE_CHOICES,
         default=USER,
+        help_text='Выберите роль пользователя',
     )
 
     class Meta:
@@ -50,7 +53,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == self.ADMIN or self.is_superuser
+        return (self.role == self.ADMIN) or self.is_superuser
 
     def send_confirmation_code(self, token):
         send_mail(
