@@ -1,25 +1,21 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (filters, generics, mixins,
-                            permissions, status, viewsets)
+from rest_framework import (filters, generics, mixins, permissions, status,
+                            viewsets)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
 
 from api import serializers
-from .filters import TitleFilter
-from api.permissions import (IsAdministrator,
-                             IsAdministratorOrReadOnly,
+from api.filters import TitleFilter
+from api.permissions import (IsAdministrator, IsAdministratorOrReadOnly,
                              IsAuthorOrModeratorOrAdminOrReadOnly)
-from api.serializers import (CategorySerializer,
-                             CommentSerializer,
-                             GenreSerializer,
-                             ReviewSerializer,
-                             TitleSerializer,
-                             TitlePostSerializer)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, ReviewSerializer,
+                             TitlePostSerializer, TitleSerializer)
 from api.utils import get_token_for_user
 
 User = get_user_model()
@@ -30,10 +26,9 @@ class SignUpView(APIView):
 
     def post(self, request):
         serializer = serializers.SignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetTokenView(APIView):
@@ -41,11 +36,9 @@ class GetTokenView(APIView):
 
     def post(self, request):
         serializer = serializers.TokenSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(get_token_for_user(user),
-                            status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(get_token_for_user(user), status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
