@@ -39,7 +39,7 @@ class SignUpSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     username = serializers.RegexField(r'^[\w.@+-]+$', max_length=150)
     confirmation_code = serializers.RegexField(
-        r'^(?:\d{5})|(?:\d{3}-[\w]{20})$')
+        r'^(?:\d{5})|(?:\d{3}-\w{20})$')
 
 
 class UserSerializer(serializers.ModelSerializer):
