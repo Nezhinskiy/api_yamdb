@@ -39,7 +39,6 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ['date_joined']
 
     @property
     def is_user(self):
@@ -51,7 +50,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == self.ADMIN
+        return self.role == self.ADMIN or self.is_superuser
 
     def send_confirmation_code(self, token):
         send_mail(
