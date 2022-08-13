@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,7 +16,7 @@ from api.permissions import (IsAdministrator, IsAdministratorOrReadOnly,
                              IsAuthorOrModeratorOrAdminOrReadOnly)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
-                             TitlePostSerializer, TitleSerializer)
+                             TitleReadSerializer, TitleWriteSerializer)
 from api.utils import get_token_for_user
 
 User = get_user_model()
@@ -27,7 +28,9 @@ class SignUpView(APIView):
     def post(self, request):
         serializer = serializers.SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user, _ = User.objects.get_or_create(**serializer.validated_data)
+        token = default_token_generator.make_token(user)
+        user.send_confirmation_code(token)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -37,12 +40,19 @@ class GetTokenView(APIView):
     def post(self, request):
         serializer = serializers.TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        username = serializer.validated_data['username']
+        confirmation_code = serializer.validated_data['confirmation_code']
+        user = get_object_or_404(User, username=username)
+        if not default_token_generator.check_token(user, confirmation_code):
+            return Response(
+                {'confirmation_code': 'Неверный код подтверждения!'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(get_token_for_user(user), status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.order_by('username')
     serializer_class = serializers.UserSerializer
     permission_classes = (IsAdministrator,)
     lookup_field = 'username'
@@ -131,5 +141,5 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return TitlePostSerializer
-        return TitleSerializer
+            return TitleWriteSerializer
+        return TitleReadSerializer
