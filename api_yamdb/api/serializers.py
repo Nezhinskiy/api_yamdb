@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from rest_framework import validators, serializers
+from rest_framework import serializers, validators
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
 
