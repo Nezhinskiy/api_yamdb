@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
 from django.db import models
-from django.shortcuts import get_object_or_404
 from rest_framework import validators, serializers
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
@@ -10,14 +8,17 @@ User = get_user_model()
 
 
 class SignUpSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    username = serializers.RegexField(r'^[\w.@+-]+$', max_length=150)
     email = serializers.EmailField()
 
-    def validate(self, data):
-        if data['username'] == 'me':
+    def validate_username(self, value):
+        if value == 'me':
             raise serializers.ValidationError(
                 {'username': 'Недопустимое имя пользователя!'}
             )
+        return value
+
+    def validate(self, data):
         if User.objects.filter(
             ~models.Q(email=data['email']),
             username=data['username'],
@@ -34,30 +35,11 @@ class SignUpSerializer(serializers.Serializer):
             )
         return data
 
-    def create(self, validated_data):
-        user, _ = User.objects.get_or_create(**validated_data)
-        token = default_token_generator.make_token(user)
-        user.save()
-        user.send_confirmation_code(token)
-        return user
-
 
 class TokenSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    confirmation_code = serializers.CharField()
-
-    def validate(self, data):
-        user = get_object_or_404(User, username=data['username'])
-        if not default_token_generator.check_token(
-            user, data['confirmation_code']
-        ):
-            raise serializers.ValidationError(
-                {'confirmation_code': 'Неверный код подтверждения!'}
-            )
-        return data
-
-    def create(self, validated_data):
-        return User.objects.get(username=validated_data['username'])
+    username = serializers.RegexField(r'^[\w.@+-]+$', max_length=150)
+    confirmation_code = serializers.RegexField(
+        r'^(?:\d{5})|(?:\d{3}-\w{20})$')
 
 
 class UserSerializer(serializers.ModelSerializer):
