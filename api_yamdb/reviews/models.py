@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator
 from django.db import models
 from titles.models import Title
 
@@ -28,11 +29,13 @@ class Review(models.Model):
         verbose_name='Произведение',
         help_text='Произведение, к которой будет относиться ревью'
     )
-    text = models.TextField()
+    text = models.TextField(verbose_name='Текст отзыва')
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews'
+        User, on_delete=models.CASCADE, related_name='reviews',
+        verbose_name='Автор отзыва'
     )
-    score = models.IntegerField(
+    score = models.PositiveIntegerField(
+        validators=[MaxValueValidator(10)],
         choices=SCORE_CHOICES, verbose_name='Баллы'
     )
     pub_date = models.DateTimeField(
@@ -47,7 +50,7 @@ class Review(models.Model):
                 fields=['author', 'title'], name='unique_review')]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text[:DISPLAYED_LETTERS]
@@ -58,8 +61,8 @@ class Comment(models.Model):
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Ревью',
-        help_text='Ревью, к которой будет относиться комментарий'
+        verbose_name='Отзыв',
+        help_text='Отзыв, к которой будет относиться комментарий'
     )
     text = models.TextField(verbose_name='Текст комментария',
                             help_text='Текст нового комментария')
@@ -67,7 +70,7 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Автор'
+        verbose_name='Автор комментария'
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -78,7 +81,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text[:DISPLAYED_LETTERS]
