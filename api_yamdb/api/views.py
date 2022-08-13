@@ -60,19 +60,21 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.select_related('title', 'author').all()
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthorOrModeratorOrAdminOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
-        return title.reviews.all()
+        get_object_or_404(Title, id=title_id)
+        queryset = Review.objects.select_related(
+            'title', 'author'
+        ).only('title__id', 'author__username').filter(title_id=title_id)
+        return queryset
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
-        serializer.save(author=self.request.user, title=title)
+        get_object_or_404(Title, id=title_id)
+        serializer.save(author=self.request.user, title_id=title_id)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -82,17 +84,22 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, title=title, id=review_id)
-        return review.comments.all()
+        get_object_or_404(Review.objects.select_related(
+             'title').only('title__id'), id=review_id, title_id=title_id)
+        queryset = Comment.objects.select_related(
+            'review', 'author'
+        ).only('review__id', 'review__title', 'author__username').filter(
+            review_id=review_id, review__title_id=title_id
+        )
+        return queryset
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, id=review_id, title=title)
-        serializer.save(author=self.request.user, review=review)
+        get_object_or_404(Review.objects.select_related(
+            'title').only('title__id'), id=review_id, title_id=title_id)
+        serializer.save(author=self.request.user, review_id=review_id)
 
 
 class CategoryGenreViewSet(mixins.CreateModelMixin,
