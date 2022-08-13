@@ -16,7 +16,7 @@ from api.permissions import (IsAdministrator, IsAdministratorOrReadOnly,
                              IsAuthorOrModeratorOrAdminOrReadOnly)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ReviewSerializer,
-                             TitlePostSerializer, TitleSerializer)
+                             TitleReadSerializer, TitleWriteSerializer)
 from api.utils import get_token_for_user
 
 User = get_user_model()
@@ -134,5 +134,5 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return TitlePostSerializer
-        return TitleSerializer
+            return TitleWriteSerializer
+        return TitleReadSerializer
